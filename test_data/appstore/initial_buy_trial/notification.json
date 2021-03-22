@@ -1,0 +1,72 @@
+{
+  "latest_receipt": "secret",
+  "latest_receipt_info": {
+    "original_purchase_date_pst": "2021-03-05 13:27:30 America/Los_Angeles",
+    "quantity": "1",
+    "subscription_group_identifier": "20505083",
+    "unique_vendor_identifier": "65D6CB37-CBC1-46FB-BA76-7E925B57544B",
+    "original_purchase_date_ms": "1614979650000",
+    "expires_date_formatted": "2021-03-12 21:27:29 Etc/GMT",
+    "is_in_intro_offer_period": "false",
+    "purchase_date_ms": "1614979649000",
+    "expires_date_formatted_pst": "2021-03-12 13:27:29 America/Los_Angeles",
+    "is_trial_period": "true",
+    "item_id": "1486295308",
+    "unique_identifier": "162b8fe35845a195c9d6fda81c77de648ff6cbca",
+    "original_transaction_id": "440000843175886",
+    "expires_date": "1615584449000",
+    "app_item_id": "1163786766",
+    "transaction_id": "440000843175886",
+    "in_app_ownership_type": "PURCHASED",
+    "bvrs": "7087",
+    "web_order_line_item_id": "440000332559239",
+    "version_external_identifier": "840632337",
+    "bid": "droom.sleepIfUCanFree",
+    "product_id": "droom.sleepIfUCanFree.premium.monthly.4",
+    "purchase_date": "2021-03-05 21:27:29 Etc/GMT",
+    "purchase_date_pst": "2021-03-05 13:27:29 America/Los_Angeles",
+    "original_purchase_date": "2021-03-05 21:27:30 Etc/GMT"
+  },
+  "environment": "PROD",
+  "auto_renew_status": "true",
+  "unified_receipt": {
+    "latest_receipt": "secret",
+    "pending_renewal_info": [
+      {
+        "original_transaction_id": "440000843175886",
+        "product_id": "droom.sleepIfUCanFree.premium.monthly.4",
+        "auto_renew_status": "1",
+        "auto_renew_product_id": "droom.sleepIfUCanFree.premium.monthly.4"
+      }
+    ],
+    "environment": "Production",
+    "status": 0,
+    "latest_receipt_info": [
+      {
+        "expires_date_pst": "2021-03-12 13:27:29 America/Los_Angeles",
+        "purchase_date": "2021-03-05 21:27:29 Etc/GMT",
+        "in_app_ownership_type": "PURCHASED",
+        "purchase_date_ms": "1614979649000",
+        "original_purchase_date_ms": "1614979650000",
+        "transaction_id": "440000843175886",
+        "original_transaction_id": "440000843175886",
+        "quantity": "1",
+        "expires_date_ms": "1615584449000",
+        "original_purchase_date_pst": "2021-03-05 13:27:30 America/Los_Angeles",
+        "product_id": "droom.sleepIfUCanFree.premium.monthly.4",
+        "subscription_group_identifier": "20505083",
+        "web_order_line_item_id": "440000332559239",
+        "expires_date": "2021-03-12 21:27:29 Etc/GMT",
+        "is_in_intro_offer_period": "false",
+        "original_purchase_date": "2021-03-05 21:27:30 Etc/GMT",
+        "purchase_date_pst": "2021-03-05 13:27:29 America/Los_Angeles",
+        "is_trial_period": "true"
+      }
+    ]
+  },
+  "bvrs": "7087",
+  "bid": "droom.sleepIfUCanFree",
+  "password": "secret",
+  "auto_renew_product_id": "droom.sleepIfUCanFree.premium.monthly.4",
+  "notification_type": "INITIAL_BUY"
+}

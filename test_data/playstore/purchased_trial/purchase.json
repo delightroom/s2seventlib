@@ -1,0 +1,13 @@
+{
+  "startTimeMillis": "1616392270256",
+  "expiryTimeMillis": "1617004259005",
+  "autoRenewing": true,
+  "priceCurrencyCode": "IDR",
+  "priceAmountMicros": "74000000000",
+  "countryCode": "ID",
+  "developerPayload": "",
+  "paymentState": 2,
+  "orderId": "GPA.3361-6715-6845-07355",
+  "acknowledgementState": 1,
+  "kind": "androidpublisher#subscriptionPurchase"
+}
