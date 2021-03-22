@@ -17,7 +17,7 @@ const FAKE_USER_ID = "fake-user-id"
 
 type MockUserStore struct{}
 
-func (s MockUserStore) userID(token string) (string, error) {
+func (s MockUserStore) UserID(token string) (string, error) {
 	return FAKE_USER_ID, nil
 }
 

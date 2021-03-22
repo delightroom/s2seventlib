@@ -37,7 +37,7 @@ func (g EventGenerator) GeneratePlayStorePurchaseEvent(ctx context.Context, noti
 	msg := fmt.Sprintf("%s, %d", token, notiType)
 	fmt.Println(msg)
 
-	userID, err := g.userIDProvider.userID(token)
+	userID, err := g.userIDProvider.UserID(token)
 
 	// fmt.Printf("userId: %s\n", userID)
 
@@ -133,7 +133,7 @@ func (g EventGenerator) GenerateAppStoreEvent(ctx context.Context, noti AppStore
 			if receiptInfo.WebOrderLineItemID == webOrderLineItemID {
 				token := receiptInfo.OriginalTransactionID
 
-				userID, err := g.userIDProvider.userID(token)
+				userID, err := g.userIDProvider.UserID(token)
 				if err != nil {
 					return CommonEvent{}, err
 				}
@@ -170,7 +170,7 @@ func (g EventGenerator) GenerateAppStoreEvent(ctx context.Context, noti AppStore
 	} else if notiType == appstore.NotificationTypeDidChangeRenewalStatus {
 		inApp := noti.UnifiedReceipt.LatestReceiptInfo[0]
 		token := inApp.OriginalTransactionID
-		userID, err := g.userIDProvider.userID(token)
+		userID, err := g.userIDProvider.UserID(token)
 		if err != nil {
 			return CommonEvent{}, err
 		}
@@ -200,7 +200,7 @@ func (g EventGenerator) GenerateAppStoreEvent(ctx context.Context, noti AppStore
 	} else if notiType == appstore.NotificationTypeInitialBuy || notiType == appstore.NotificationTypeDidRenew || notiType == appstore.NotificationTypeDidRecover || notiType == appstore.NotificationTypeInteractiveRenewal {
 		inApp := noti.UnifiedReceipt.LatestReceiptInfo[0]
 		token := inApp.OriginalTransactionID
-		userID, err := g.userIDProvider.userID(token)
+		userID, err := g.userIDProvider.UserID(token)
 		if err != nil {
 			return CommonEvent{}, err
 		}
