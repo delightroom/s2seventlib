@@ -24,6 +24,13 @@ type EventGenerator struct {
 	playStoreVerifier PlayStoreVerifier
 }
 
+func NewEventGenerator(userIDProvider UserIDProvider, playStoreVerifier PlayStoreVerifier) EventGenerator {
+	return EventGenerator{
+		userIDProvider:    userIDProvider,
+		playStoreVerifier: playStoreVerifier,
+	}
+}
+
 func (g EventGenerator) GeneratePlayStorePurchaseEvent(ctx context.Context, noti playstore.DeveloperNotification) (CommonEvent, error) {
 	token := noti.SubscriptionNotification.PurchaseToken
 	notiType := noti.SubscriptionNotification.NotificationType

@@ -77,15 +77,11 @@ func loadAppStoreTestFixture(notificationType string) (AppStoreNotificationV2, e
 }
 
 func eventGeneratorForPlayStoreTesting(purchase androidpublisher.SubscriptionPurchase) EventGenerator {
-	return EventGenerator{
-		MockUserStore{}, MockPlayStoreVerifier{purchase},
-	}
+	return NewEventGenerator(MockUserStore{}, MockPlayStoreVerifier{purchase})
 }
 
 func eventGeneratorForAppStoreTesting() EventGenerator {
-	return EventGenerator{
-		MockUserStore{}, MockPlayStoreVerifier{},
-	}
+	return NewEventGenerator(MockUserStore{}, MockPlayStoreVerifier{})
 }
 
 func TestPlayStorePurchasedTrialEventGeneration(t *testing.T) {
