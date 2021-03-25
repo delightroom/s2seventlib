@@ -1,0 +1,16 @@
+{
+  "event_type": "re_enable",
+  "user_id": "fake-user-id",
+  "platform": "ios",
+  "event_time_millis": 1614990541000,
+  "env": "prod",
+  "properties": {
+    "payment_state": 1,
+    "app_id": "",
+    "product_id": "droom.sleepIfUCanFree.premium.monthlyPromo.4",
+    "currency": "USD",
+    "price": 3.49,
+    "quantity": 1,
+    "cancellation_reason": ""
+  }
+}
