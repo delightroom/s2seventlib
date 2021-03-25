@@ -13,6 +13,8 @@ import (
 	"google.golang.org/api/androidpublisher/v3"
 )
 
+// Mocks
+
 const FAKE_USER_ID = "fake-user-id"
 
 type MockUserStore struct{}
@@ -35,6 +37,54 @@ func (v MockPlayStoreVerifier) Verify(
 ) (*androidpublisher.SubscriptionPurchase, error) {
 	return &v.result, nil
 }
+
+// Tests
+
+func TestPlayStorePurchasedTrialEventGeneration(t *testing.T) {
+	testPlayStoreEventGeneration(t, "purchased_trial")
+}
+
+func TestPlayStoreRenewedEventGeneration(t *testing.T) {
+	testPlayStoreEventGeneration(t, "renewed")
+}
+
+func TestPlayStoreRecoveredEventGeneration(t *testing.T) {
+	testPlayStoreEventGeneration(t, "recovered")
+}
+
+func TestPlayStoreRestartedEventGeneration(t *testing.T) {
+	testPlayStoreEventGeneration(t, "restarted")
+}
+
+func TestAppStoreInitialBuyPaidEventGeneration(t *testing.T) {
+	testAppStoreEventGeneration(t, "initial_buy_paid")
+}
+
+func TestAppStoreInitialBuyTrialEventGeneration(t *testing.T) {
+	testAppStoreEventGeneration(t, "initial_buy_trial")
+}
+
+func TestAppStoreCancelEventGeneration(t *testing.T) {
+	testAppStoreEventGeneration(t, "cancel")
+}
+
+func TestAppStoreDidRecoverEventGeneration(t *testing.T) {
+	testAppStoreEventGeneration(t, "did_recover")
+}
+
+func TestAppStoreDidRenewEventGeneration(t *testing.T) {
+	testAppStoreEventGeneration(t, "did_renew")
+}
+
+func TestAppStoreDidChangeRenewalStatusEventGeneration(t *testing.T) {
+	testAppStoreEventGeneration(t, "did_change_renewal_status")
+}
+
+func TestAppStoreInteractiveRenewalEventGeneration(t *testing.T) {
+	testAppStoreEventGeneration(t, "interactive_renewal")
+}
+
+// Helpers
 
 func loadJSONFile(filepath string, dest interface{}) error {
 	bytes, err := ioutil.ReadFile(filepath)
@@ -95,10 +145,10 @@ func eventGeneratorForAppStoreTesting() EventGenerator {
 	return NewEventGenerator(MockUserStore{}, MockPlayStoreVerifier{})
 }
 
-func TestPlayStorePurchasedTrialEventGeneration(t *testing.T) {
+func testPlayStoreEventGeneration(t *testing.T, notificationType string) {
 	assert := assert.New(t)
 
-	noti, purchase, expected, err := loadPlayStoreTestFixture("purchased_trial")
+	noti, purchase, expected, err := loadPlayStoreTestFixture(notificationType)
 	assert.NoError(err)
 
 	eventGen := eventGeneratorForPlayStoreTesting(purchase)
@@ -109,52 +159,10 @@ func TestPlayStorePurchasedTrialEventGeneration(t *testing.T) {
 	assert.Equal(expected, event)
 }
 
-func TestPlayStoreRenewedEventGeneration(t *testing.T) {
+func testAppStoreEventGeneration(t *testing.T, notificationType string) {
 	assert := assert.New(t)
 
-	noti, purchase, expected, err := loadPlayStoreTestFixture("renewed")
-	assert.NoError(err)
-
-	eventGen := eventGeneratorForPlayStoreTesting(purchase)
-
-	ctx := context.Background()
-	event, err := eventGen.GeneratePlayStorePurchaseEvent(ctx, noti)
-	assert.NoError(err)
-	assert.Equal(expected, event)
-}
-
-func TestPlayStoreRecoveredEventGeneration(t *testing.T) {
-	assert := assert.New(t)
-
-	noti, purchase, expected, err := loadPlayStoreTestFixture("recovered")
-	assert.NoError(err)
-
-	eventGen := eventGeneratorForPlayStoreTesting(purchase)
-
-	ctx := context.Background()
-	event, err := eventGen.GeneratePlayStorePurchaseEvent(ctx, noti)
-	assert.NoError(err)
-	assert.Equal(expected, event)
-}
-
-func TestPlayStoreRestartedEventGeneration(t *testing.T) {
-	assert := assert.New(t)
-
-	noti, purchase, expected, err := loadPlayStoreTestFixture("restarted")
-	assert.NoError(err)
-
-	eventGen := eventGeneratorForPlayStoreTesting(purchase)
-
-	ctx := context.Background()
-	event, err := eventGen.GeneratePlayStorePurchaseEvent(ctx, noti)
-	assert.NoError(err)
-	assert.Equal(expected, event)
-}
-
-func TestAppStoreInitialBuyPaidEventGeneration(t *testing.T) {
-	assert := assert.New(t)
-
-	noti, expected, err := loadAppStoreTestFixture("initial_buy_paid")
+	noti, expected, err := loadAppStoreTestFixture(notificationType)
 	assert.NoError(err)
 
 	eventGen := eventGeneratorForAppStoreTesting()
@@ -164,92 +172,6 @@ func TestAppStoreInitialBuyPaidEventGeneration(t *testing.T) {
 	assert.NoError(err)
 	assert.Equal(expected, event)
 }
-
-func TestAppStoreInitialBuyTrialEventGeneration(t *testing.T) {
-	assert := assert.New(t)
-
-	noti, expected, err := loadAppStoreTestFixture("initial_buy_trial")
-	assert.NoError(err)
-
-	eventGen := eventGeneratorForAppStoreTesting()
-
-	ctx := context.Background()
-	event, err := eventGen.GenerateAppStoreEvent(ctx, noti)
-	assert.NoError(err)
-	assert.Equal(expected, event)
-}
-
-func TestAppStoreCancelEventGeneration(t *testing.T) {
-	assert := assert.New(t)
-
-	noti, expected, err := loadAppStoreTestFixture("cancel")
-	assert.NoError(err)
-
-	eventGen := eventGeneratorForAppStoreTesting()
-
-	ctx := context.Background()
-	event, err := eventGen.GenerateAppStoreEvent(ctx, noti)
-	assert.NoError(err)
-	assert.Equal(expected, event)
-}
-
-func TestAppStoreDidRecoverEventGeneration(t *testing.T) {
-	assert := assert.New(t)
-
-	noti, expected, err := loadAppStoreTestFixture("did_recover")
-	assert.NoError(err)
-
-	eventGen := eventGeneratorForAppStoreTesting()
-
-	ctx := context.Background()
-	event, err := eventGen.GenerateAppStoreEvent(ctx, noti)
-	assert.NoError(err)
-	assert.Equal(expected, event)
-}
-
-func TestAppStoreDidRenewEventGeneration(t *testing.T) {
-	assert := assert.New(t)
-
-	noti, expected, err := loadAppStoreTestFixture("did_renew")
-	assert.NoError(err)
-
-	eventGen := eventGeneratorForAppStoreTesting()
-
-	ctx := context.Background()
-	event, err := eventGen.GenerateAppStoreEvent(ctx, noti)
-	assert.NoError(err)
-	assert.Equal(expected, event)
-}
-
-func TestAppStoreDidChangeRenewalStatusEventGeneration(t *testing.T) {
-	assert := assert.New(t)
-
-	noti, expected, err := loadAppStoreTestFixture("did_change_renewal_status")
-	assert.NoError(err)
-
-	eventGen := eventGeneratorForAppStoreTesting()
-
-	ctx := context.Background()
-	event, err := eventGen.GenerateAppStoreEvent(ctx, noti)
-	assert.NoError(err)
-	assert.Equal(expected, event)
-}
-
-func TestAppStoreInteractiveRenewalEventGeneration(t *testing.T) {
-	assert := assert.New(t)
-
-	noti, expected, err := loadAppStoreTestFixture("interactive_renewal")
-	assert.NoError(err)
-
-	eventGen := eventGeneratorForAppStoreTesting()
-
-	ctx := context.Background()
-	event, err := eventGen.GenerateAppStoreEvent(ctx, noti)
-	assert.NoError(err)
-	assert.Equal(expected, event)
-}
-
-// Helpers
 
 func printPlayStorePurchase(notification playstore.DeveloperNotification) {
 	client := GetAndroidPublisherAPIClient()
