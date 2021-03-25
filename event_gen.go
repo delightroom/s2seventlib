@@ -2,7 +2,6 @@ package s2seventlib
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"strconv"
 
@@ -34,8 +33,8 @@ func NewEventGenerator(userIDProvider UserIDProvider, playStoreVerifier PlayStor
 func (g EventGenerator) GeneratePlayStorePurchaseEvent(ctx context.Context, noti playstore.DeveloperNotification) (CommonEvent, error) {
 	token := noti.SubscriptionNotification.PurchaseToken
 	notiType := noti.SubscriptionNotification.NotificationType
-	msg := fmt.Sprintf("%s, %d", token, notiType)
-	fmt.Println(msg)
+	// msg := fmt.Sprintf("%s, %d", token, notiType)
+	// fmt.Println(msg)
 
 	userID, err := g.userIDProvider.UserID(token)
 
@@ -70,19 +69,7 @@ func (g EventGenerator) GeneratePlayStorePurchaseEvent(ctx context.Context, noti
 		return CommonEvent{}, err
 	}
 
-	var paymentState string
-	switch purchase.PaymentState {
-	case 0:
-		paymentState = "pending"
-	case 1:
-		paymentState = "received"
-	case 2:
-		paymentState = "trial"
-	case 3:
-		paymentState = "pending deferred upgrade/downgrade"
-	}
-
-	fmt.Printf("type: %d, state: %s, price: %d, currency:%s\n", notiType, paymentState, purchase.PriceAmountMicros, purchase.PriceCurrencyCode)
+	// fmt.Printf("type: %d, state: %s, price: %d, currency:%s\n", notiType, paymentState, purchase.PriceAmountMicros, purchase.PriceCurrencyCode)
 
 	timestamp, err := strconv.Atoi(noti.EventTimeMillis)
 	if err != nil {
