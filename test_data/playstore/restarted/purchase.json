@@ -1,0 +1,12 @@
+{
+  "acknowledgementState": 1,
+  "autoRenewing": true,
+  "countryCode": "GB",
+  "expiryTimeMillis": "1619031805296",
+  "kind": "androidpublisher#subscriptionPurchase",
+  "orderId": "GPA.3395-8842-1641-64603..0",
+  "paymentState": 1,
+  "priceAmountMicros": "3990000",
+  "priceCurrencyCode": "GBP",
+  "startTimeMillis": "1615741482900"
+}

@@ -1,0 +1,16 @@
+{
+  "event_type": "purchase",
+  "user_id": "fake-user-id",
+  "platform": "android",
+  "event_time_millis": 1616392272813,
+  "env": "prod",
+  "properties": {
+    "payment_state": 2,
+    "app_id": "",
+    "product_id": "alarmy_premium_monthly_01",
+    "currency": "IDR",
+    "price": 74000,
+    "quantity": 1,
+    "cancellation_reason": ""
+  }
+}

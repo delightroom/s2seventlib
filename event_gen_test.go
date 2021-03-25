@@ -36,29 +36,38 @@ func (v MockPlayStoreVerifier) Verify(
 	return &v.result, nil
 }
 
-func loadPlayStoreTestFixture(notificationType string) (playstore.DeveloperNotification, androidpublisher.SubscriptionPurchase, error) {
+func loadPlayStoreTestFixture(notificationType string) (playstore.DeveloperNotification, androidpublisher.SubscriptionPurchase, CommonEvent, error) {
 	bytes, err := ioutil.ReadFile(fmt.Sprintf("test_data/playstore/%s/notification.json", notificationType))
 	if err != nil {
-		return playstore.DeveloperNotification{}, androidpublisher.SubscriptionPurchase{}, errors.Wrapf(err, "failed to read notification file for notification type %s", notificationType)
+		return playstore.DeveloperNotification{}, androidpublisher.SubscriptionPurchase{}, CommonEvent{}, errors.Wrapf(err, "failed to read notification file for notification type %s", notificationType)
 	}
 
 	noti := playstore.DeveloperNotification{}
 
 	if err := json.Unmarshal(bytes, &noti); err != nil {
-		return playstore.DeveloperNotification{}, androidpublisher.SubscriptionPurchase{}, err
+		return playstore.DeveloperNotification{}, androidpublisher.SubscriptionPurchase{}, CommonEvent{}, err
 	}
 
 	bytes, err = ioutil.ReadFile(fmt.Sprintf("test_data/playstore/%s/purchase.json", notificationType))
 	if err != nil {
-		return playstore.DeveloperNotification{}, androidpublisher.SubscriptionPurchase{}, errors.Wrapf(err, "failed to read purchase file for notification type %s", notificationType)
+		return playstore.DeveloperNotification{}, androidpublisher.SubscriptionPurchase{}, CommonEvent{}, errors.Wrapf(err, "failed to read purchase file for notification type %s", notificationType)
 	}
 
 	purchase := androidpublisher.SubscriptionPurchase{}
 
 	if err := json.Unmarshal(bytes, &purchase); err != nil {
-		return playstore.DeveloperNotification{}, androidpublisher.SubscriptionPurchase{}, err
+		return playstore.DeveloperNotification{}, androidpublisher.SubscriptionPurchase{}, CommonEvent{}, err
 	}
-	return noti, purchase, nil
+
+	bytes, err = ioutil.ReadFile(fmt.Sprintf("test_data/playstore/%s/expected.json", notificationType))
+
+	event := CommonEvent{}
+
+	if err := json.Unmarshal(bytes, &event); err != nil {
+		return playstore.DeveloperNotification{}, androidpublisher.SubscriptionPurchase{}, CommonEvent{}, err
+	}
+
+	return noti, purchase, event, nil
 }
 
 func loadAppStoreTestFixture(notificationType string) (AppStoreNotificationV2, error) {
@@ -87,7 +96,7 @@ func eventGeneratorForAppStoreTesting() EventGenerator {
 func TestPlayStorePurchasedTrialEventGeneration(t *testing.T) {
 	assert := assert.New(t)
 
-	noti, purchase, err := loadPlayStoreTestFixture("purchased_trial")
+	noti, purchase, expected, err := loadPlayStoreTestFixture("purchased_trial")
 	assert.NoError(err)
 
 	eventGen := eventGeneratorForPlayStoreTesting(purchase)
@@ -95,26 +104,13 @@ func TestPlayStorePurchasedTrialEventGeneration(t *testing.T) {
 	ctx := context.Background()
 	event, err := eventGen.GeneratePlayStorePurchaseEvent(ctx, noti)
 	assert.NoError(err)
-
-	// base
-	assert.Equal("android", event.Platform)
-	assert.Equal(FAKE_USER_ID, event.UserID)
-	assert.Equal(CommonEventPurchase, event.EventType)
-	assert.Equal(noti.EventTimeMillis, fmt.Sprintf("%d", event.EventTimeMillis))
-	assert.Equal("prod", event.Env)
-
-	// properties
-	assert.Equal(PaymentStateTrial, event.Properties.PaymentState)
-	assert.Equal(noti.SubscriptionNotification.SubscriptionID, event.Properties.ProductID)
-	assert.Equal(purchase.PriceCurrencyCode, event.Properties.Currency)
-	assert.Equal(purchase.PriceAmountMicros, int64(event.Properties.Price*1_000_000))
-	assert.Equal(1, event.Properties.Quantity)
+	assert.Equal(expected, event)
 }
 
 func TestPlayStoreRenewedEventGeneration(t *testing.T) {
 	assert := assert.New(t)
 
-	noti, purchase, err := loadPlayStoreTestFixture("renewed")
+	noti, purchase, expected, err := loadPlayStoreTestFixture("renewed")
 	assert.NoError(err)
 
 	eventGen := eventGeneratorForPlayStoreTesting(purchase)
@@ -122,26 +118,13 @@ func TestPlayStoreRenewedEventGeneration(t *testing.T) {
 	ctx := context.Background()
 	event, err := eventGen.GeneratePlayStorePurchaseEvent(ctx, noti)
 	assert.NoError(err)
-
-	// base
-	assert.Equal("android", event.Platform)
-	assert.Equal(FAKE_USER_ID, event.UserID)
-	assert.Equal(CommonEventRenew, event.EventType)
-	assert.Equal(noti.EventTimeMillis, fmt.Sprintf("%d", event.EventTimeMillis))
-	assert.Equal("prod", event.Env)
-
-	// properties
-	assert.Equal(PaymentStateReceived, event.Properties.PaymentState)
-	assert.Equal(noti.SubscriptionNotification.SubscriptionID, event.Properties.ProductID)
-	assert.Equal(purchase.PriceCurrencyCode, event.Properties.Currency)
-	assert.Equal(purchase.PriceAmountMicros, int64(event.Properties.Price*1_000_000))
-	assert.Equal(1, event.Properties.Quantity)
+	assert.Equal(expected, event)
 }
 
 func TestPlayStoreRecoveredEventGeneration(t *testing.T) {
 	assert := assert.New(t)
 
-	noti, purchase, err := loadPlayStoreTestFixture("recovered")
+	noti, purchase, expected, err := loadPlayStoreTestFixture("recovered")
 	assert.NoError(err)
 
 	eventGen := eventGeneratorForPlayStoreTesting(purchase)
@@ -149,20 +132,21 @@ func TestPlayStoreRecoveredEventGeneration(t *testing.T) {
 	ctx := context.Background()
 	event, err := eventGen.GeneratePlayStorePurchaseEvent(ctx, noti)
 	assert.NoError(err)
+	assert.Equal(expected, event)
+}
 
-	// base
-	assert.Equal("android", event.Platform)
-	assert.Equal(FAKE_USER_ID, event.UserID)
-	assert.Equal(CommonEventRecover, event.EventType)
-	assert.Equal(noti.EventTimeMillis, fmt.Sprintf("%d", event.EventTimeMillis))
-	assert.Equal("prod", event.Env)
+func TestPlayStoreRestartedEventGeneration(t *testing.T) {
+	assert := assert.New(t)
 
-	// properties
-	assert.Equal(PaymentStateReceived, event.Properties.PaymentState)
-	assert.Equal(noti.SubscriptionNotification.SubscriptionID, event.Properties.ProductID)
-	assert.Equal(purchase.PriceCurrencyCode, event.Properties.Currency)
-	assert.Equal(purchase.PriceAmountMicros, int64(event.Properties.Price*1_000_000))
-	assert.Equal(1, event.Properties.Quantity)
+	noti, purchase, expected, err := loadPlayStoreTestFixture("restarted")
+	assert.NoError(err)
+
+	eventGen := eventGeneratorForPlayStoreTesting(purchase)
+
+	ctx := context.Background()
+	event, err := eventGen.GeneratePlayStorePurchaseEvent(ctx, noti)
+	assert.NoError(err)
+	assert.Equal(expected, event)
 }
 
 func TestAppStoreInitialBuyPaidEventGeneration(t *testing.T) {
@@ -349,4 +333,14 @@ func TestAppStoreInteractiveRenewalEventGeneration(t *testing.T) {
 	assert.Equal("USD", event.Properties.Currency)
 	assert.Equal(3.49, event.Properties.Price)
 	assert.Equal(1, event.Properties.Quantity)
+}
+
+// Helpers
+
+func printPlayStorePurchase(notification playstore.DeveloperNotification) {
+	client := GetAndroidPublisherAPIClient()
+	ctx := context.Background()
+	purchase, _ := client.Verify(ctx, notification.PackageName, notification.SubscriptionNotification.SubscriptionID, notification.SubscriptionNotification.SubscriptionID)
+	bytes, _ := json.MarshalIndent(purchase, "", "  ")
+	fmt.Printf("%s\n", string(bytes))
 }

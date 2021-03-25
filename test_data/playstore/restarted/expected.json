@@ -1,0 +1,16 @@
+{
+  "event_type": "re_enable",
+  "user_id": "fake-user-id",
+  "platform": "android",
+  "event_time_millis": 1616587856246,
+  "env": "prod",
+  "properties": {
+    "payment_state": 1,
+    "app_id": "",
+    "product_id": "alarmy_premium_monthly_01",
+    "currency": "GBP",
+    "price": 3.99,
+    "quantity": 1,
+    "cancellation_reason": ""
+  }
+}

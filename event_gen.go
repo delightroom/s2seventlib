@@ -46,13 +46,16 @@ func (g EventGenerator) GeneratePlayStorePurchaseEvent(ctx context.Context, noti
 	}
 
 	var eventType CommonEventType
-	if notiType == playstore.SubscriptionNotificationTypePurchased {
+	switch notiType {
+	case playstore.SubscriptionNotificationTypePurchased:
 		eventType = CommonEventPurchase
-	} else if notiType == playstore.SubscriptionNotificationTypeRenewed {
+	case playstore.SubscriptionNotificationTypeRenewed:
 		eventType = CommonEventRenew
-	} else if notiType == playstore.SubscriptionNotificationTypeRecovered {
+	case playstore.SubscriptionNotificationTypeRecovered:
 		eventType = CommonEventRecover
-	} else {
+	case playstore.SubscriptionNotificationTypeRestarted:
+		eventType = CommonEventReEnable
+	default:
 		return CommonEvent{}, errors.Errorf("not purchase event: %d", notiType)
 	}
 

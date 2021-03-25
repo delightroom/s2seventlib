@@ -1,0 +1,16 @@
+{
+  "event_type": "renew",
+  "user_id": "fake-user-id",
+  "platform": "android",
+  "event_time_millis": 1616398113893,
+  "env": "prod",
+  "properties": {
+    "payment_state": 1,
+    "app_id": "",
+    "product_id": "alarmy_premium_monthly_01",
+    "currency": "USD",
+    "price": 4.99,
+    "quantity": 1,
+    "cancellation_reason": ""
+  }
+}
