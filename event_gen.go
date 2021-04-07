@@ -101,6 +101,8 @@ func priceForAppStoreProduct(productID string) (float64, error) {
 		return 4.99, nil
 	case "droom.sleepIfUCanFree.premium.monthlyPromo.4":
 		return 3.49, nil
+	case "droom.sleepIfUCanFree.premium.yearly.4":
+		return 41.99, nil
 	default:
 		return 0, errors.Errorf("cannot find price info for the productID: %s", productID)
 	}
