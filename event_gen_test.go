@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"testing"
 
+	"github.com/awa/go-iap/appstore"
 	"github.com/awa/go-iap/playstore"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -121,17 +122,17 @@ func loadPlayStoreTestFixture(notificationType string) (playstore.DeveloperNotif
 	return noti, purchase, event, nil
 }
 
-func loadAppStoreTestFixture(notificationType string) (AppStoreNotificationV2, CommonEvent, error) {
-	noti := AppStoreNotificationV2{}
+func loadAppStoreTestFixture(notificationType string) (appstore.SubscriptionNotification, CommonEvent, error) {
+	noti := appstore.SubscriptionNotification{}
 
 	if err := loadJSONFile(fmt.Sprintf("test_data/appstore/%s/notification.json", notificationType), &noti); err != nil {
-		return AppStoreNotificationV2{}, CommonEvent{}, err
+		return appstore.SubscriptionNotification{}, CommonEvent{}, err
 	}
 
 	expected := CommonEvent{}
 
 	if err := loadJSONFile(fmt.Sprintf("test_data/appstore/%s/expected.json", notificationType), &expected); err != nil {
-		return AppStoreNotificationV2{}, CommonEvent{}, err
+		return appstore.SubscriptionNotification{}, CommonEvent{}, err
 	}
 
 	return noti, expected, nil

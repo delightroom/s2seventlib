@@ -10,14 +10,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-type AppStoreNotificationV2 struct {
-	// original notification
-	appstore.SubscriptionNotification
-
-	// missing properties
-	AutoRenewStatusChangeDateMS string `json:"auto_renew_status_change_date_ms"`
-}
-
 type EventGenerator struct {
 	userIDProvider    UserIDProvider
 	playStoreVerifier PlayStoreVerifier
@@ -108,7 +100,7 @@ func priceForAppStoreProduct(productID string) (float64, error) {
 	}
 }
 
-func (g EventGenerator) GenerateAppStoreEvent(ctx context.Context, noti AppStoreNotificationV2) (CommonEvent, error) {
+func (g EventGenerator) GenerateAppStoreEvent(ctx context.Context, noti appstore.SubscriptionNotification) (CommonEvent, error) {
 
 	notiType := noti.NotificationType
 	var env string
