@@ -6,7 +6,7 @@ const (
 	CommonEventPurchase         CommonEventType = "purchase"
 	CommonEventRenew            CommonEventType = "renew"
 	CommonEventRecover          CommonEventType = "recover"
-	CommonEventReEnable         CommonEventType = "re_enable"
+	CommonEventRestart          CommonEventType = "restart"
 	CommonEventPause            CommonEventType = "pause"
 	CommonEventTurnOnAutoRenew  CommonEventType = "turn_on_auto_renew"
 	CommonEventTurnOffAutoRenew CommonEventType = "turn_off_auto_renew"
