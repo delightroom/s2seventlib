@@ -45,7 +45,7 @@ func (g EventGenerator) GeneratePlayStorePurchaseEvent(ctx context.Context, noti
 	case playstore.SubscriptionNotificationTypeRecovered:
 		eventType = CommonEventRecover
 	case playstore.SubscriptionNotificationTypeRestarted:
-		eventType = CommonEventReEnable
+		eventType = CommonEventRestart
 	default:
 		return CommonEvent{}, errors.Errorf("not purchase event: %d", notiType)
 	}
@@ -197,7 +197,7 @@ func (g EventGenerator) GenerateAppStoreEvent(ctx context.Context, noti appstore
 		case appstore.NotificationTypeDidRecover:
 			eventType = CommonEventRecover
 		case appstore.NotificationTypeInteractiveRenewal:
-			eventType = CommonEventReEnable
+			eventType = CommonEventRestart
 		default:
 			eventType = CommonEventRenew
 		}

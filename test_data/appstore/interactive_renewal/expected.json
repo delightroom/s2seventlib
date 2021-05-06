@@ -1,5 +1,5 @@
 {
-  "event_type": "re_enable",
+  "event_type": "restart",
   "user_id": "fake-user-id",
   "platform": "ios",
   "event_time_millis": 1614990541000,
