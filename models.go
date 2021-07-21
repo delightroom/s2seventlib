@@ -16,7 +16,7 @@ const (
 type PaymentState int64
 
 const (
-	PaymentStatePending         PaymentState = 0
+	PaymentStatePending         PaymentState = 0 // Cancel과 같이 PaymentState값이 없는 경우도 0으로 지정한다.
 	PaymentStateReceived        PaymentState = 1
 	PaymentStateTrial           PaymentState = 2
 	PaymentStatePendingDeferred PaymentState = 3

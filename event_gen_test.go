@@ -57,6 +57,10 @@ func TestPlayStoreRestartedEventGeneration(t *testing.T) {
 	testPlayStoreEventGeneration(t, "restarted")
 }
 
+func TestPlayStoreCanceledEventGeneration(t *testing.T) {
+	testPlayStoreEventGeneration(t, "canceled")
+}
+
 func TestAppStoreInitialBuyPaidEventGeneration(t *testing.T) {
 	testAppStoreEventGeneration(t, "initial_buy_paid")
 }
@@ -151,6 +155,9 @@ func testPlayStoreEventGeneration(t *testing.T, notificationType string) {
 
 	noti, purchase, expected, err := loadPlayStoreTestFixture(notificationType)
 	assert.NoError(err)
+	// fmt.Println("🌻")
+	// printPlayStorePurchase(noti)
+	// fmt.Println("🌻")
 
 	eventGen := eventGeneratorForPlayStoreTesting(purchase)
 
@@ -177,7 +184,15 @@ func testAppStoreEventGeneration(t *testing.T, notificationType string) {
 func printPlayStorePurchase(notification playstore.DeveloperNotification) {
 	client := GetAndroidPublisherAPIClient()
 	ctx := context.Background()
-	purchase, _ := client.Verify(ctx, notification.PackageName, notification.SubscriptionNotification.SubscriptionID, notification.SubscriptionNotification.SubscriptionID)
+	purchase, err := client.Verify(ctx, notification.PackageName, notification.SubscriptionNotification.SubscriptionID, notification.SubscriptionNotification.PurchaseToken)
+	fmt.Println("notification.PackageName:", notification.PackageName)
+	fmt.Println("notification.SubscriptionNotification.NotificationType:", notification.SubscriptionNotification.NotificationType)
+	fmt.Println("notification.SubscriptionNotification.SubscriptionID:", notification.SubscriptionNotification.SubscriptionID)
+	fmt.Println("notification.SubscriptionNotification.PurchaseToken:", notification.SubscriptionNotification.PurchaseToken)
+
+	if err != nil {
+		fmt.Println("🐛", err)
+	}
 	bytes, _ := json.MarshalIndent(purchase, "", "  ")
 	fmt.Printf("%s\n", string(bytes))
 }

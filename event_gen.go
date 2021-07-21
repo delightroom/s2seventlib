@@ -46,16 +46,18 @@ func (g EventGenerator) GeneratePlayStorePurchaseEvent(ctx context.Context, noti
 		eventType = CommonEventRecover
 	case playstore.SubscriptionNotificationTypeRestarted:
 		eventType = CommonEventRestart
+	case playstore.SubscriptionNotificationTypeRevoked:
+		eventType = CommonEventCancel
 	default:
 		return CommonEvent{}, errors.Errorf("not purchase event: %d", notiType)
 	}
 
 	purchase, err := g.playStoreVerifier.Verify(ctx, noti.PackageName, noti.SubscriptionNotification.SubscriptionID, token)
 
-	// fmt.Printf("%+v\n", purchase)
+	// fmt.Printf("🍎%+v\n", purchase)
 
 	// bytes, _ := json.MarshalIndent(purchase, "", "\t")
-	// fmt.Printf("%s\n", string(bytes))
+	// fmt.Printf("🍏%s\n", string(bytes))
 
 	if err != nil {
 		return CommonEvent{}, err
