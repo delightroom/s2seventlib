@@ -2,6 +2,7 @@ package s2seventlib
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strconv"
 
@@ -68,6 +69,28 @@ func (g EventGenerator) GeneratePlayStorePurchaseEvent(ctx context.Context, noti
 	timestamp, err := strconv.Atoi(noti.EventTimeMillis)
 	if err != nil {
 		return CommonEvent{}, err
+	}
+
+	cancellationReason := ""
+	if purchase.CancelSurveyResult != nil {
+		fmt.Println("CancelSurveyResult exists...")
+		cancellationReason = strconv.FormatInt(purchase.CancelSurveyResult.CancelSurveyReason, 10)
+		return CommonEvent{
+			EventType:       eventType,
+			UserID:          userID,
+			Platform:        "android",
+			EventTimeMillis: timestamp,
+			Env:             "prod",
+			Properties: CommonEventProperties{
+				PaymentState:       PaymentState(purchase.PaymentState),
+				AppID:              os.Getenv("BRAZE_APP_ID"),
+				ProductID:          noti.SubscriptionNotification.SubscriptionID,
+				Currency:           purchase.PriceCurrencyCode,
+				Price:              float64(purchase.PriceAmountMicros) / 1_000_000,
+				Quantity:           1,
+				CancellationReason: cancellationReason,
+			},
+		}, nil
 	}
 
 	return CommonEvent{
