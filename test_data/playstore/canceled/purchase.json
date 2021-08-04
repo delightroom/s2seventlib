@@ -1,5 +1,6 @@
 {
     "acknowledgementState": 1,
+    "cancelReason":0,
     "cancelSurveyResult": {
       "cancelSurveyReason": 1
     },

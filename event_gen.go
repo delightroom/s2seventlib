@@ -2,7 +2,6 @@ package s2seventlib
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"strconv"
 
@@ -71,10 +70,8 @@ func (g EventGenerator) GeneratePlayStorePurchaseEvent(ctx context.Context, noti
 		return CommonEvent{}, err
 	}
 
-	cancellationReason := ""
-	if purchase.CancelSurveyResult != nil {
-		fmt.Println("CancelSurveyResult exists...")
-		cancellationReason = strconv.FormatInt(purchase.CancelSurveyResult.CancelSurveyReason, 10)
+	if eventType == "cancel" {
+		cancellationReason := strconv.FormatInt(purchase.CancelReason, 10)
 		return CommonEvent{
 			EventType:       eventType,
 			UserID:          userID,
