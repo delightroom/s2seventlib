@@ -1,0 +1,17 @@
+{
+    "event_type": "cancel",
+    "user_id": "fake-user-id",
+    "platform": "android",
+    "event_time_millis": 1626806555912,
+    "env": "prod",
+    "properties": {
+      "payment_state": 0,
+      "app_id": "",
+      "product_id": "alarmy_premium_yearly_01",
+      "currency": "GBP",
+      "price": 29.49,
+      "quantity": 1,
+      "cancellation_reason": "0"
+    }
+  }
+  

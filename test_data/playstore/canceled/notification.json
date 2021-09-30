@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "packageName": "droom.sleepIfUCan",
-  "eventTimeMillis": "1626806555912",
+  "eventTimeMillis": "1633044842700",
   "subscriptionNotification": {
     "version": "1.0",
-    "notificationType": 12,
-    "purchaseToken": "abbchjlikpleklehgjijgcof.AO-J1OxfYYHSn-RM6gueY3EZYIROKhePqtmI0__L62ZVT94BV8xoZz8Z-NdzPxETxjEWJrYWFWIEH7UbBIdpB_huWAmAC6LyZQ",
-    "subscriptionId": "alarmy_premium_yearly_01"
+    "notificationType": 3,
+    "purchaseToken": "dbbmobklgdialdcghfadnhem.AO-J1OxeAT5JLRPqQoLWkJKPyO7VXpEs4kYp9f8jv8-PZwtgZlsvaZvCAs1BgCwokTwC9zep89hTB7loWuOWtYdZiVt_bLW2sg",
+    "subscriptionId": "alarmy_premium_monthly_01_discount_30"
   }
 }

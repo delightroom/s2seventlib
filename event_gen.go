@@ -22,7 +22,7 @@ func NewEventGenerator(userIDProvider UserIDProvider, playStoreVerifier PlayStor
 	}
 }
 
-func (g EventGenerator) GeneratePlayStorePurchaseEvent(ctx context.Context, noti playstore.DeveloperNotification) (CommonEvent, error) {
+func (g EventGenerator) GeneratePlayStoreEvent(ctx context.Context, noti playstore.DeveloperNotification) (CommonEvent, error) {
 	token := noti.SubscriptionNotification.PurchaseToken
 	notiType := noti.SubscriptionNotification.NotificationType
 	// msg := fmt.Sprintf("%s, %d", token, notiType)
@@ -48,6 +48,8 @@ func (g EventGenerator) GeneratePlayStorePurchaseEvent(ctx context.Context, noti
 		eventType = CommonEventRestart
 	case playstore.SubscriptionNotificationTypeRevoked:
 		eventType = CommonEventCancel
+	case playstore.SubscriptionNotificationTypeCanceled:
+		eventType = CommonEventTurnOffAutoRenew
 	default:
 		return CommonEvent{}, errors.Errorf("not purchase event: %d", notiType)
 	}
@@ -70,6 +72,15 @@ func (g EventGenerator) GeneratePlayStorePurchaseEvent(ctx context.Context, noti
 		return CommonEvent{}, err
 	}
 
+	props := CommonEventProperties{
+		PaymentState: PaymentState(purchase.PaymentState),
+		AppID:        os.Getenv("BRAZE_APP_ID"),
+		ProductID:    noti.SubscriptionNotification.SubscriptionID,
+		Currency:     purchase.PriceCurrencyCode,
+		Price:        float64(purchase.PriceAmountMicros) / 1_000_000,
+		Quantity:     1,
+	}
+
 	if eventType == "cancel" {
 		cancellationReason := strconv.FormatInt(purchase.CancelReason, 10)
 		return CommonEvent{
@@ -88,6 +99,8 @@ func (g EventGenerator) GeneratePlayStorePurchaseEvent(ctx context.Context, noti
 				CancellationReason: cancellationReason,
 			},
 		}, nil
+	} else if eventType == CommonEventTurnOffAutoRenew {
+		props.CancellationReason = strconv.FormatInt(purchase.CancelReason, 10)
 	}
 
 	return CommonEvent{
@@ -96,14 +109,7 @@ func (g EventGenerator) GeneratePlayStorePurchaseEvent(ctx context.Context, noti
 		Platform:        "android",
 		EventTimeMillis: timestamp,
 		Env:             "prod",
-		Properties: CommonEventProperties{
-			PaymentState: PaymentState(purchase.PaymentState),
-			AppID:        os.Getenv("BRAZE_APP_ID"),
-			ProductID:    noti.SubscriptionNotification.SubscriptionID,
-			Currency:     purchase.PriceCurrencyCode,
-			Price:        float64(purchase.PriceAmountMicros) / 1_000_000,
-			Quantity:     1,
-		},
+		Properties:      props,
 	}, nil
 }
 

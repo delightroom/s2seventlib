@@ -57,6 +57,10 @@ func TestPlayStoreRestartedEventGeneration(t *testing.T) {
 	testPlayStoreEventGeneration(t, "restarted")
 }
 
+func TestPlayStoreRevokedEventGeneration(t *testing.T) {
+	testPlayStoreEventGeneration(t, "revoked")
+}
+
 func TestPlayStoreCanceledEventGeneration(t *testing.T) {
 	testPlayStoreEventGeneration(t, "canceled")
 }
@@ -151,6 +155,7 @@ func eventGeneratorForAppStoreTesting() EventGenerator {
 }
 
 func testPlayStoreEventGeneration(t *testing.T, notificationType string) {
+	t.Helper()
 	assert := assert.New(t)
 
 	noti, purchase, expected, err := loadPlayStoreTestFixture(notificationType)
@@ -162,7 +167,7 @@ func testPlayStoreEventGeneration(t *testing.T, notificationType string) {
 	eventGen := eventGeneratorForPlayStoreTesting(purchase)
 
 	ctx := context.Background()
-	event, err := eventGen.GeneratePlayStorePurchaseEvent(ctx, noti)
+	event, err := eventGen.GeneratePlayStoreEvent(ctx, noti)
 	assert.NoError(err)
 	assert.Equal(expected, event)
 }
