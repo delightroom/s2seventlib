@@ -2,6 +2,7 @@ package s2seventlib
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strconv"
 
@@ -25,16 +26,13 @@ func NewEventGenerator(userIDProvider UserIDProvider, playStoreVerifier PlayStor
 func (g EventGenerator) GeneratePlayStoreEvent(ctx context.Context, noti playstore.DeveloperNotification) (CommonEvent, error) {
 	token := noti.SubscriptionNotification.PurchaseToken
 	notiType := noti.SubscriptionNotification.NotificationType
-	// msg := fmt.Sprintf("%s, %d", token, notiType)
-	// fmt.Println(msg)
-
 	userID, err := g.userIDProvider.UserID(token)
-
-	// fmt.Printf("userId: %s\n", userID)
 
 	if err != nil {
 		return CommonEvent{}, err
 	}
+
+	fmt.Printf("token: %s, notiType: %d, userID: %s\n", token, notiType, userID)
 
 	var eventType CommonEventType
 	switch notiType {
@@ -56,16 +54,9 @@ func (g EventGenerator) GeneratePlayStoreEvent(ctx context.Context, noti playsto
 
 	purchase, err := g.playStoreVerifier.Verify(ctx, noti.PackageName, noti.SubscriptionNotification.SubscriptionID, token)
 
-	// fmt.Printf("🍎%+v\n", purchase)
-
-	// bytes, _ := json.MarshalIndent(purchase, "", "\t")
-	// fmt.Printf("🍏%s\n", string(bytes))
-
 	if err != nil {
 		return CommonEvent{}, err
 	}
-
-	// fmt.Printf("type: %d, state: %s, price: %d, currency:%s\n", notiType, paymentState, purchase.PriceAmountMicros, purchase.PriceCurrencyCode)
 
 	timestamp, err := strconv.Atoi(noti.EventTimeMillis)
 	if err != nil {
@@ -81,25 +72,7 @@ func (g EventGenerator) GeneratePlayStoreEvent(ctx context.Context, noti playsto
 		Quantity:     1,
 	}
 
-	if eventType == "cancel" {
-		cancellationReason := strconv.FormatInt(purchase.CancelReason, 10)
-		return CommonEvent{
-			EventType:       eventType,
-			UserID:          userID,
-			Platform:        "android",
-			EventTimeMillis: timestamp,
-			Env:             "prod",
-			Properties: CommonEventProperties{
-				PaymentState:       PaymentState(purchase.PaymentState),
-				AppID:              os.Getenv("BRAZE_APP_ID"),
-				ProductID:          noti.SubscriptionNotification.SubscriptionID,
-				Currency:           purchase.PriceCurrencyCode,
-				Price:              float64(purchase.PriceAmountMicros) / 1_000_000,
-				Quantity:           1,
-				CancellationReason: cancellationReason,
-			},
-		}, nil
-	} else if eventType == CommonEventTurnOffAutoRenew {
+	if eventType == CommonEventCancel || eventType == CommonEventTurnOffAutoRenew {
 		props.CancellationReason = strconv.FormatInt(purchase.CancelReason, 10)
 	}
 
