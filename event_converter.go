@@ -11,59 +11,59 @@ import (
 	"github.com/pkg/errors"
 )
 
-type EventGenerator struct {
+type EventConverter struct {
 	userIDProvider    UserIDProvider
 	playStoreVerifier PlayStoreVerifier
 }
 
-func NewEventGenerator(userIDProvider UserIDProvider, playStoreVerifier PlayStoreVerifier) EventGenerator {
-	return EventGenerator{
+func NewEventConverter(userIDProvider UserIDProvider, playStoreVerifier PlayStoreVerifier) EventConverter {
+	return EventConverter{
 		userIDProvider:    userIDProvider,
 		playStoreVerifier: playStoreVerifier,
 	}
 }
 
-func (g EventGenerator) GeneratePlayStoreEvent(ctx context.Context, noti playstore.DeveloperNotification) (CommonEvent, error) {
+func (g EventConverter) ConvertPlayStoreEvent(ctx context.Context, noti playstore.DeveloperNotification) (Event, error) {
 	token := noti.SubscriptionNotification.PurchaseToken
 	notiType := noti.SubscriptionNotification.NotificationType
 	userID, err := g.userIDProvider.UserID(token)
 
 	if err != nil {
-		return CommonEvent{}, err
+		return Event{}, err
 	}
 
 	fmt.Printf("token: %s, notiType: %d, userID: %s\n", token, notiType, userID)
 
-	var eventType CommonEventType
+	var eventType EventType
 	switch notiType {
 	case playstore.SubscriptionNotificationTypePurchased:
-		eventType = CommonEventPurchase
+		eventType = EventPurchase
 	case playstore.SubscriptionNotificationTypeRenewed:
-		eventType = CommonEventRenew
+		eventType = EventRenew
 	case playstore.SubscriptionNotificationTypeRecovered:
-		eventType = CommonEventRecover
+		eventType = EventRecover
 	case playstore.SubscriptionNotificationTypeRestarted:
-		eventType = CommonEventRestart
+		eventType = EventRestart
 	case playstore.SubscriptionNotificationTypeRevoked:
-		eventType = CommonEventCancel
+		eventType = EventCancel
 	case playstore.SubscriptionNotificationTypeCanceled:
-		eventType = CommonEventTurnOffAutoRenew
+		eventType = EventTurnOffAutoRenew
 	default:
-		return CommonEvent{}, errors.Errorf("not purchase event: %d", notiType)
+		return Event{}, errors.Errorf("not purchase event: %d", notiType)
 	}
 
 	purchase, err := g.playStoreVerifier.Verify(ctx, noti.PackageName, noti.SubscriptionNotification.SubscriptionID, token)
 
 	if err != nil {
-		return CommonEvent{}, err
+		return Event{}, err
 	}
 
 	timestamp, err := strconv.Atoi(noti.EventTimeMillis)
 	if err != nil {
-		return CommonEvent{}, err
+		return Event{}, err
 	}
 
-	props := CommonEventProperties{
+	props := EventProperties{
 		PaymentState: PaymentState(purchase.PaymentState),
 		AppID:        os.Getenv("BRAZE_APP_ID"),
 		ProductID:    noti.SubscriptionNotification.SubscriptionID,
@@ -72,11 +72,11 @@ func (g EventGenerator) GeneratePlayStoreEvent(ctx context.Context, noti playsto
 		Quantity:     1,
 	}
 
-	if eventType == CommonEventCancel || eventType == CommonEventTurnOffAutoRenew {
+	if eventType == EventCancel || eventType == EventTurnOffAutoRenew {
 		props.CancellationReason = strconv.FormatInt(purchase.CancelReason, 10)
 	}
 
-	return CommonEvent{
+	return Event{
 		EventType:       eventType,
 		UserID:          userID,
 		Platform:        "android",
@@ -109,7 +109,7 @@ func priceForAppStoreProduct(productID string) (float64, error) {
 	}
 }
 
-func (g EventGenerator) GenerateAppStoreEvent(ctx context.Context, noti appstore.SubscriptionNotification) (CommonEvent, error) {
+func (g EventConverter) ConvertAppStoreEvent(ctx context.Context, noti appstore.SubscriptionNotification) (Event, error) {
 
 	notiType := noti.NotificationType
 	var env string
@@ -128,27 +128,27 @@ func (g EventGenerator) GenerateAppStoreEvent(ctx context.Context, noti appstore
 
 				userID, err := g.userIDProvider.UserID(token)
 				if err != nil {
-					return CommonEvent{}, err
+					return Event{}, err
 				}
 
 				timestamp, err := strconv.Atoi(receiptInfo.CancellationDateMS)
 				if err != nil {
-					return CommonEvent{}, err
+					return Event{}, err
 				}
 
 				// Get price based on Product ID
 				price, err := priceForAppStoreProduct(receiptInfo.ProductID)
 				if err != nil {
-					return CommonEvent{}, err
+					return Event{}, err
 				}
 
-				return CommonEvent{
-					EventType:       CommonEventCancel,
+				return Event{
+					EventType:       EventCancel,
 					UserID:          userID,
 					Platform:        "ios",
 					EventTimeMillis: timestamp,
 					Env:             env,
-					Properties: CommonEventProperties{
+					Properties: EventProperties{
 						Price:              price,
 						Currency:           "USD",
 						Quantity:           1,
@@ -159,34 +159,34 @@ func (g EventGenerator) GenerateAppStoreEvent(ctx context.Context, noti appstore
 			}
 		}
 
-		return CommonEvent{}, errors.Errorf("failed to find receiptInfo for webOrderLineItemID: %s", webOrderLineItemID)
+		return Event{}, errors.Errorf("failed to find receiptInfo for webOrderLineItemID: %s", webOrderLineItemID)
 	} else if notiType == appstore.NotificationTypeDidChangeRenewalStatus {
 		inApp := noti.UnifiedReceipt.LatestReceiptInfo[0]
 		token := inApp.OriginalTransactionID
 		userID, err := g.userIDProvider.UserID(token)
 		if err != nil {
-			return CommonEvent{}, err
+			return Event{}, err
 		}
 
-		var eventType CommonEventType
+		var eventType EventType
 		if noti.AutoRenewStatus == "true" {
-			eventType = CommonEventTurnOnAutoRenew
+			eventType = EventTurnOnAutoRenew
 		} else {
-			eventType = CommonEventTurnOffAutoRenew
+			eventType = EventTurnOffAutoRenew
 		}
 
 		timestamp, err := strconv.Atoi(noti.AutoRenewStatusChangeDateMS)
 		if err != nil {
-			return CommonEvent{}, err
+			return Event{}, err
 		}
 
-		return CommonEvent{
+		return Event{
 			EventType:       eventType,
 			UserID:          userID,
 			Platform:        "ios",
 			EventTimeMillis: timestamp,
 			Env:             env,
-			Properties: CommonEventProperties{
+			Properties: EventProperties{
 				ProductID: noti.AutoRenewProductID,
 			},
 		}, err
@@ -195,20 +195,20 @@ func (g EventGenerator) GenerateAppStoreEvent(ctx context.Context, noti appstore
 		token := inApp.OriginalTransactionID
 		userID, err := g.userIDProvider.UserID(token)
 		if err != nil {
-			return CommonEvent{}, err
+			return Event{}, err
 		}
 
 		// Determine event type
-		var eventType CommonEventType
+		var eventType EventType
 		switch notiType {
 		case appstore.NotificationTypeInitialBuy:
-			eventType = CommonEventPurchase
+			eventType = EventPurchase
 		case appstore.NotificationTypeDidRecover:
-			eventType = CommonEventRecover
+			eventType = EventRecover
 		case appstore.NotificationTypeInteractiveRenewal:
-			eventType = CommonEventRestart
+			eventType = EventRestart
 		default:
-			eventType = CommonEventRenew
+			eventType = EventRenew
 		}
 
 		// Get payment state
@@ -220,22 +220,22 @@ func (g EventGenerator) GenerateAppStoreEvent(ctx context.Context, noti appstore
 		// Parse timestamp
 		timestamp, err := strconv.Atoi(inApp.PurchaseDateMS)
 		if err != nil {
-			return CommonEvent{}, err
+			return Event{}, err
 		}
 
 		// Get price based on Product ID
 		price, err := priceForAppStoreProduct(inApp.ProductID)
 		if err != nil {
-			return CommonEvent{}, err
+			return Event{}, err
 		}
 
-		return CommonEvent{
+		return Event{
 			EventType:       eventType,
 			UserID:          userID,
 			Platform:        "ios",
 			EventTimeMillis: timestamp,
 			Env:             "prod",
-			Properties: CommonEventProperties{
+			Properties: EventProperties{
 				PaymentState: paymentState,
 				AppID:        os.Getenv("BRAZE_APP_ID"),
 				ProductID:    inApp.ProductID,
@@ -246,5 +246,5 @@ func (g EventGenerator) GenerateAppStoreEvent(ctx context.Context, noti appstore
 		}, nil
 	}
 
-	return CommonEvent{}, errors.Errorf("processing notification type %s is not supported yet", notiType)
+	return Event{}, errors.Errorf("processing notification type %s is not supported yet", notiType)
 }

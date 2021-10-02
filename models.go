@@ -1,16 +1,16 @@
 package s2seventlib
 
-type CommonEventType string
+type EventType string
 
 const (
-	CommonEventPurchase         CommonEventType = "purchase"
-	CommonEventRenew            CommonEventType = "renew"
-	CommonEventRecover          CommonEventType = "recover"
-	CommonEventRestart          CommonEventType = "restart"
-	CommonEventPause            CommonEventType = "pause"
-	CommonEventTurnOnAutoRenew  CommonEventType = "turn_on_auto_renew"
-	CommonEventTurnOffAutoRenew CommonEventType = "turn_off_auto_renew"
-	CommonEventCancel           CommonEventType = "cancel"
+	EventPurchase         EventType = "purchase"
+	EventRenew            EventType = "renew"
+	EventRecover          EventType = "recover"
+	EventRestart          EventType = "restart"
+	EventPause            EventType = "pause"
+	EventTurnOnAutoRenew  EventType = "turn_on_auto_renew"
+	EventTurnOffAutoRenew EventType = "turn_off_auto_renew"
+	EventCancel           EventType = "cancel"
 )
 
 type PaymentState int64
@@ -22,16 +22,16 @@ const (
 	PaymentStatePendingDeferred PaymentState = 3
 )
 
-type CommonEvent struct {
-	EventType       CommonEventType       `json:"event_type"`
-	UserID          string                `json:"user_id"`
-	Platform        string                `json:"platform"`
-	EventTimeMillis int                   `json:"event_time_millis"`
-	Env             string                `json:"env"`
-	Properties      CommonEventProperties `json:"properties"`
+type Event struct {
+	EventType       EventType       `json:"event_type"`
+	UserID          string          `json:"user_id"`
+	Platform        string          `json:"platform"`
+	EventTimeMillis int             `json:"event_time_millis"`
+	Env             string          `json:"env"`
+	Properties      EventProperties `json:"properties"`
 }
 
-type CommonEventProperties struct {
+type EventProperties struct {
 	PaymentState       PaymentState `json:"payment_state"`
 	AppID              string       `json:"app_id"`
 	ProductID          string       `json:"product_id"`

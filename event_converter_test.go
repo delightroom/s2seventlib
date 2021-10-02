@@ -41,56 +41,56 @@ func (v MockPlayStoreVerifier) Verify(
 
 // Tests
 
-func TestPlayStorePurchasedTrialEventGeneration(t *testing.T) {
-	testPlayStoreEventGeneration(t, "purchased_trial")
+func TestPlayStorePurchasedTrialEventConversion(t *testing.T) {
+	testPlayStoreEventConversion(t, "purchased_trial")
 }
 
-func TestPlayStoreRenewedEventGeneration(t *testing.T) {
-	testPlayStoreEventGeneration(t, "renewed")
+func TestPlayStoreRenewedEventConversion(t *testing.T) {
+	testPlayStoreEventConversion(t, "renewed")
 }
 
-func TestPlayStoreRecoveredEventGeneration(t *testing.T) {
-	testPlayStoreEventGeneration(t, "recovered")
+func TestPlayStoreRecoveredEventConversion(t *testing.T) {
+	testPlayStoreEventConversion(t, "recovered")
 }
 
-func TestPlayStoreRestartedEventGeneration(t *testing.T) {
-	testPlayStoreEventGeneration(t, "restarted")
+func TestPlayStoreRestartedEventConversion(t *testing.T) {
+	testPlayStoreEventConversion(t, "restarted")
 }
 
-func TestPlayStoreRevokedEventGeneration(t *testing.T) {
-	testPlayStoreEventGeneration(t, "revoked")
+func TestPlayStoreRevokedEventConversion(t *testing.T) {
+	testPlayStoreEventConversion(t, "revoked")
 }
 
-func TestPlayStoreCanceledEventGeneration(t *testing.T) {
-	testPlayStoreEventGeneration(t, "canceled")
+func TestPlayStoreCanceledEventConversion(t *testing.T) {
+	testPlayStoreEventConversion(t, "canceled")
 }
 
-func TestAppStoreInitialBuyPaidEventGeneration(t *testing.T) {
-	testAppStoreEventGeneration(t, "initial_buy_paid")
+func TestAppStoreInitialBuyPaidEventConversion(t *testing.T) {
+	testAppStoreEventConversion(t, "initial_buy_paid")
 }
 
-func TestAppStoreInitialBuyTrialEventGeneration(t *testing.T) {
-	testAppStoreEventGeneration(t, "initial_buy_trial")
+func TestAppStoreInitialBuyTrialEventConversion(t *testing.T) {
+	testAppStoreEventConversion(t, "initial_buy_trial")
 }
 
-func TestAppStoreCancelEventGeneration(t *testing.T) {
-	testAppStoreEventGeneration(t, "cancel")
+func TestAppStoreCancelEventConversion(t *testing.T) {
+	testAppStoreEventConversion(t, "cancel")
 }
 
-func TestAppStoreDidRecoverEventGeneration(t *testing.T) {
-	testAppStoreEventGeneration(t, "did_recover")
+func TestAppStoreDidRecoverEventConversion(t *testing.T) {
+	testAppStoreEventConversion(t, "did_recover")
 }
 
-func TestAppStoreDidRenewEventGeneration(t *testing.T) {
-	testAppStoreEventGeneration(t, "did_renew")
+func TestAppStoreDidRenewEventConversion(t *testing.T) {
+	testAppStoreEventConversion(t, "did_renew")
 }
 
-func TestAppStoreDidChangeRenewalStatusEventGeneration(t *testing.T) {
-	testAppStoreEventGeneration(t, "did_change_renewal_status")
+func TestAppStoreDidChangeRenewalStatusEventConversion(t *testing.T) {
+	testAppStoreEventConversion(t, "did_change_renewal_status")
 }
 
-func TestAppStoreInteractiveRenewalEventGeneration(t *testing.T) {
-	testAppStoreEventGeneration(t, "interactive_renewal")
+func TestAppStoreInteractiveRenewalEventConversion(t *testing.T) {
+	testAppStoreEventConversion(t, "interactive_renewal")
 }
 
 // Helpers
@@ -108,53 +108,53 @@ func loadJSONFile(filepath string, dest interface{}) error {
 	return nil
 }
 
-func loadPlayStoreTestFixture(notificationType string) (playstore.DeveloperNotification, androidpublisher.SubscriptionPurchase, CommonEvent, error) {
+func loadPlayStoreTestFixture(notificationType string) (playstore.DeveloperNotification, androidpublisher.SubscriptionPurchase, Event, error) {
 	noti := playstore.DeveloperNotification{}
 
 	if err := loadJSONFile(fmt.Sprintf("test_data/playstore/%s/notification.json", notificationType), &noti); err != nil {
-		return playstore.DeveloperNotification{}, androidpublisher.SubscriptionPurchase{}, CommonEvent{}, err
+		return playstore.DeveloperNotification{}, androidpublisher.SubscriptionPurchase{}, Event{}, err
 	}
 
 	purchase := androidpublisher.SubscriptionPurchase{}
 
 	if err := loadJSONFile(fmt.Sprintf("test_data/playstore/%s/purchase.json", notificationType), &purchase); err != nil {
-		return playstore.DeveloperNotification{}, androidpublisher.SubscriptionPurchase{}, CommonEvent{}, err
+		return playstore.DeveloperNotification{}, androidpublisher.SubscriptionPurchase{}, Event{}, err
 	}
 
-	event := CommonEvent{}
+	event := Event{}
 
 	if err := loadJSONFile(fmt.Sprintf("test_data/playstore/%s/expected.json", notificationType), &event); err != nil {
-		return playstore.DeveloperNotification{}, androidpublisher.SubscriptionPurchase{}, CommonEvent{}, err
+		return playstore.DeveloperNotification{}, androidpublisher.SubscriptionPurchase{}, Event{}, err
 	}
 
 	return noti, purchase, event, nil
 }
 
-func loadAppStoreTestFixture(notificationType string) (appstore.SubscriptionNotification, CommonEvent, error) {
+func loadAppStoreTestFixture(notificationType string) (appstore.SubscriptionNotification, Event, error) {
 	noti := appstore.SubscriptionNotification{}
 
 	if err := loadJSONFile(fmt.Sprintf("test_data/appstore/%s/notification.json", notificationType), &noti); err != nil {
-		return appstore.SubscriptionNotification{}, CommonEvent{}, err
+		return appstore.SubscriptionNotification{}, Event{}, err
 	}
 
-	expected := CommonEvent{}
+	expected := Event{}
 
 	if err := loadJSONFile(fmt.Sprintf("test_data/appstore/%s/expected.json", notificationType), &expected); err != nil {
-		return appstore.SubscriptionNotification{}, CommonEvent{}, err
+		return appstore.SubscriptionNotification{}, Event{}, err
 	}
 
 	return noti, expected, nil
 }
 
-func eventGeneratorForPlayStoreTesting(purchase androidpublisher.SubscriptionPurchase) EventGenerator {
-	return NewEventGenerator(MockUserStore{}, MockPlayStoreVerifier{purchase})
+func eventConverterForPlayStoreTesting(purchase androidpublisher.SubscriptionPurchase) EventConverter {
+	return NewEventConverter(MockUserStore{}, MockPlayStoreVerifier{purchase})
 }
 
-func eventGeneratorForAppStoreTesting() EventGenerator {
-	return NewEventGenerator(MockUserStore{}, MockPlayStoreVerifier{})
+func eventConverterForAppStoreTesting() EventConverter {
+	return NewEventConverter(MockUserStore{}, MockPlayStoreVerifier{})
 }
 
-func testPlayStoreEventGeneration(t *testing.T, notificationType string) {
+func testPlayStoreEventConversion(t *testing.T, notificationType string) {
 	t.Helper()
 	assert := assert.New(t)
 
@@ -164,24 +164,24 @@ func testPlayStoreEventGeneration(t *testing.T, notificationType string) {
 	// printPlayStorePurchase(noti)
 	// fmt.Println("🌻")
 
-	eventGen := eventGeneratorForPlayStoreTesting(purchase)
+	eventGen := eventConverterForPlayStoreTesting(purchase)
 
 	ctx := context.Background()
-	event, err := eventGen.GeneratePlayStoreEvent(ctx, noti)
+	event, err := eventGen.ConvertPlayStoreEvent(ctx, noti)
 	assert.NoError(err)
 	assert.Equal(expected, event)
 }
 
-func testAppStoreEventGeneration(t *testing.T, notificationType string) {
+func testAppStoreEventConversion(t *testing.T, notificationType string) {
 	assert := assert.New(t)
 
 	noti, expected, err := loadAppStoreTestFixture(notificationType)
 	assert.NoError(err)
 
-	eventGen := eventGeneratorForAppStoreTesting()
+	eventGen := eventConverterForAppStoreTesting()
 
 	ctx := context.Background()
-	event, err := eventGen.GenerateAppStoreEvent(ctx, noti)
+	event, err := eventGen.ConvertAppStoreEvent(ctx, noti)
 	assert.NoError(err)
 	assert.Equal(expected, event)
 }
