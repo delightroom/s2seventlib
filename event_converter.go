@@ -86,27 +86,29 @@ func (g EventConverter) ConvertPlayStoreEvent(ctx context.Context, noti playstor
 	}, nil
 }
 
+var productIDtoPriceMap = map[string]float64{
+	"droom.sleepIfUCanFree.premium.monthly.0":        4.99,
+	"droom.sleepIfUCanFree.premium.yearly.0":         54.99,
+	"droom.sleepIfUCanFree.premium.monthly.1":        4.99,
+	"droom.sleepIfUCanFree.premium.yearly.1":         54.99,
+	"droom.sleepIfUCanFree.premium.yearlyPromo.0":    46.99,
+	"droom.sleepIfUCanFree.premium.yearlyPromo.1":    46.99,
+	"com.productname.premium.monthly":                10.49,
+	"droom.sleepIfUCanFree.premium.monthly.4":        4.99,
+	"droom.sleepIfUCanFree.premium.monthlyPromo.4":   3.49,
+	"droom.sleepIfUCanFree.premium.yearly.4":         41.99,
+	"droom.sleepIfUCanFree.premium.monthlyDecoy01.4": 6.99,
+	"droom.sleepIfUCanFree.premium.monthlyDecoy02.4": 7.49,
+	"droom.sleepIfUCanFree.premium.yearly01.4":       59.99,
+	"droom.sleepIfUCanFree.premium.monthlyDecoy03.4": 9.99,
+}
+
 func priceForAppStoreProduct(productID string) (float64, error) {
-	switch productID {
-	case "droom.sleepIfUCanFree.premium.monthly.1":
-		return 4.99, nil
-	case "droom.sleepIfUCanFree.premium.monthly.4":
-		return 4.99, nil
-	case "droom.sleepIfUCanFree.premium.monthlyPromo.4":
-		return 3.49, nil
-	case "droom.sleepIfUCanFree.premium.yearly.4":
-		return 41.99, nil
-	case "droom.sleepIfUCanFree.premium.monthlyDecoy01.4":
-		return 6.99, nil
-	case "droom.sleepIfUCanFree.premium.monthlyDecoy02.4":
-		return 7.49, nil
-	case "droom.sleepIfUCanFree.premium.monthlyDecoy03.4":
-		return 9.99, nil
-	case "droom.sleepIfUCanFree.premium.yearly01.4":
-		return 59.99, nil
-	default:
+	price, ok := productIDtoPriceMap[productID]
+	if !ok {
 		return 0, errors.Errorf("cannot find price info for the productID: %s", productID)
 	}
+	return price, nil
 }
 
 func (g EventConverter) ConvertAppStoreEvent(ctx context.Context, noti appstore.SubscriptionNotification) (Event, error) {
