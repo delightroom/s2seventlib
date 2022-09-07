@@ -5,7 +5,7 @@
   "event_time_millis": 1633044842700,
   "env": "prod",
   "properties": {
-    "payment_state": 0,
+    "payment_state": -1,
     "app_id": "",
     "product_id": "alarmy_premium_monthly_01_discount_30",
     "currency": "TRY",

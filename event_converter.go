@@ -63,8 +63,15 @@ func (g EventConverter) ConvertPlayStoreEvent(ctx context.Context, noti playstor
 		return Event{}, err
 	}
 
+	var paymentState PaymentState
+	if purchase.PaymentState != nil {
+		paymentState = PaymentState(*purchase.PaymentState)
+	} else {
+		paymentState = PaymentStateNonExistent
+	}
+
 	props := EventProperties{
-		PaymentState: PaymentState(purchase.PaymentState),
+		PaymentState: paymentState,
 		AppID:        os.Getenv("BRAZE_APP_ID"),
 		ProductID:    noti.SubscriptionNotification.SubscriptionID,
 		Currency:     purchase.PriceCurrencyCode,
